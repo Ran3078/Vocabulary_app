@@ -1,0 +1,7 @@
+node_modules/
+dist/
+# 個人手寫筆記照片，不進版控（若要保留版本紀錄可移除此行）
+test_data/
+dev-dist/
+*.local
+.DS_Store
