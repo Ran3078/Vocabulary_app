@@ -34,5 +34,14 @@ export interface Settings {
   direction: PracticeDirection
 }
 
-export const DEFAULT_MODEL = 'gemini-2.5-flash'
-export const MODEL_OPTIONS = ['gemini-2.5-flash', 'gemini-2.5-pro', 'gemini-flash-latest']
+// gemini-flash-latest 永遠指向最新穩定版 flash，模型退場也不會失效
+export const DEFAULT_MODEL = 'gemini-flash-latest'
+export const MODEL_OPTIONS = [
+  'gemini-flash-latest',
+  'gemini-flash-lite-latest',
+  'gemini-3.5-flash',
+  'gemini-3.1-flash-lite',
+  'gemini-2.5-flash',
+  'gemini-2.5-flash-lite',
+  'gemini-2.5-pro'
+]

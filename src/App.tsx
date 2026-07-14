@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import type { Card, DraftCard, PracticeDirection, Settings } from './types'
+import type { Card, DraftCard, PracticeDirection, Settings, SrsState } from './types'
 import { loadCards, saveCards, loadSettings, saveSettings, newId } from './lib/storage'
 import { newSrsState, gradeCard, dueCards } from './lib/srs'
 import Flashcard from './components/Flashcard'
@@ -89,6 +89,11 @@ export default function App() {
     setCards((prev) => prev.map((c) => (c.id === card.id ? { ...c, srs: gradeCard(c.srs, correct) } : c)))
   }
 
+  /** 退回上一張時撤銷評分：把該卡 SRS 還原成評分前的狀態 */
+  const restoreSrs = (cardId: string, srs: SrsState) => {
+    setCards((prev) => prev.map((c) => (c.id === cardId ? { ...c, srs } : c)))
+  }
+
   const startMode = (m: PracticeMode) => {
     if (m === 'srs') setQueue(shuffle(due))
     if (m === 'flash') setQueue(shuffle(cards).slice(0, FLASH_SESSION_SIZE))
@@ -127,6 +132,7 @@ export default function App() {
               direction={settings.direction}
               title={mode === 'srs' ? 'SRS 複習' : '自由翻牌'}
               onGrade={grade}
+              onRestore={restoreSrs}
               onExit={exit}
             />
           )}

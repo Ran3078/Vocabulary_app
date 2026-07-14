@@ -1,24 +1,40 @@
 import { useMemo, useState } from 'react'
-import type { Card, PracticeDirection } from '../types'
+import type { Card, PracticeDirection, SrsState } from '../types'
 
 interface Props {
   queue: Card[]
   direction: PracticeDirection
   title: string
   onGrade: (card: Card, correct: boolean) => void
+  /** 退回上一張時還原該卡的 SRS 狀態（撤銷剛才的評分） */
+  onRestore: (cardId: string, srs: SrsState) => void
   onExit: () => void
 }
 
-export default function Flashcard({ queue, direction, title, onGrade, onExit }: Props) {
+export default function Flashcard({ queue, direction, title, onGrade, onRestore, onExit }: Props) {
   const [index, setIndex] = useState(0)
   const [flipped, setFlipped] = useState(false)
   const [stats, setStats] = useState({ correct: 0, wrong: 0 })
+  const [history, setHistory] = useState<boolean[]>([]) // 每張已評分卡的結果（依序）
 
   // 每張卡的方向在進場時決定一次（mixed 隨機）
   const dirs = useMemo(
     () => queue.map(() => (direction === 'mixed' ? (Math.random() < 0.5 ? 'en2zh' : 'zh2en') : direction)),
     [queue, direction]
   )
+
+  const goBack = () => {
+    if (index === 0) return
+    const prevIndex = index - 1
+    const prevCard = queue[prevIndex]
+    // queue 是進場時凍結的快照，prevCard.srs 即該卡本場評分前的狀態
+    onRestore(prevCard.id, prevCard.srs)
+    const wasCorrect = history[prevIndex]
+    setStats((s) => (wasCorrect ? { ...s, correct: s.correct - 1 } : { ...s, wrong: s.wrong - 1 }))
+    setHistory((h) => h.slice(0, -1))
+    setFlipped(false)
+    setIndex(prevIndex)
+  }
 
   if (queue.length === 0) {
     return (
@@ -36,7 +52,10 @@ export default function Flashcard({ queue, direction, title, onGrade, onExit }: 
         <p className="result-line">
           認得 <strong className="good">{stats.correct}</strong>／不認得 <strong className="bad">{stats.wrong}</strong>
         </p>
-        <button className="btn btn-primary" onClick={onExit}>返回</button>
+        <div className="grade-buttons">
+          <button className="btn btn-secondary" onClick={goBack}>↩ 上一張</button>
+          <button className="btn btn-primary" onClick={onExit}>返回</button>
+        </div>
       </div>
     )
   }
@@ -47,6 +66,7 @@ export default function Flashcard({ queue, direction, title, onGrade, onExit }: 
 
   const grade = (correct: boolean) => {
     onGrade(card, correct)
+    setHistory((h) => [...h, correct])
     setStats((s) => (correct ? { ...s, correct: s.correct + 1 } : { ...s, wrong: s.wrong + 1 }))
     setFlipped(false)
     setIndex(index + 1)
@@ -56,9 +76,11 @@ export default function Flashcard({ queue, direction, title, onGrade, onExit }: 
     <div className="practice-screen">
       <div className="practice-header">
         <button className="btn-link" onClick={onExit}>✕ 結束</button>
+        <button className="btn-link" disabled={index === 0} onClick={goBack}>↩ 上一張</button>
         <span className="muted">{title}　{index + 1} / {queue.length}</span>
       </div>
-      <div className={`flip-card ${flipped ? 'flipped' : ''}`} onClick={() => setFlipped(!flipped)}>
+      {/* key=index：換卡時整張重新掛載，避免回轉動畫瞬間露出新卡答案 */}
+      <div key={index} className={`flip-card ${flipped ? 'flipped' : ''}`} onClick={() => setFlipped(!flipped)}>
         <div className="flip-inner">
           <div className="flip-face flip-front">
             <span className="flip-text">{front}</span>

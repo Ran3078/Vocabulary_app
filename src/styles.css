@@ -62,6 +62,7 @@ body {
   cursor: pointer; font-size: 0.9rem; padding: 4px 6px;
 }
 .btn-link.danger { color: #dc2626; }
+.btn-link:disabled { color: #9ca3af; cursor: default; }
 
 /* ===== 表單 ===== */
 .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
@@ -216,6 +217,17 @@ input:focus, select:focus, textarea:focus { outline: 2px solid #4f46e5; border-c
 .settings-section { background: #fff; border-radius: 14px; padding: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
 .settings-section h3 { margin: 0 0 12px; font-size: 1.05rem; }
 .settings-section a { color: #4f46e5; }
+
+.help-list {
+  margin: 0 0 14px;
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-size: 0.9rem;
+  line-height: 1.55;
+  color: #374151;
+}
 
 /* ===== Toast ===== */
 .toast {

@@ -22,6 +22,13 @@
 
 > API key 只儲存在你裝置的瀏覽器（localStorage），不會上傳到任何伺服器；AI 功能由瀏覽器直接呼叫 Google API。
 
+### ⚠️ API key 安全注意事項
+
+- **不要在該 key 的 Google 專案綁定信用卡帳單**——沒綁帳單時 key 外洩最壞只是免費額度被用完；綁了才有盜刷風險（必須綁的話請設預算警示）
+- **公用／共用電腦請勿輸入 API key**（key 以明文存在瀏覽器）；輸入過的話用完請在設定頁按「清除 API key」，並建議撤銷重發
+- 建議到 Google Cloud Console 限制 key：僅允許 Generative Language API + HTTP referrer 限制（只允許本 App 網址）
+- 裝置遺失或懷疑外洩時，立刻到 AI Studio 撤銷該 key 重發
+
 ## 本機開發
 
 ```bash
